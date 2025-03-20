@@ -3,25 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Qual é o Seu Maior Medo?</title>
+    <title>Meu Site com Busca Personalizada</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
             margin-top: 50px;
         }
-        #imageResult {
+        .gcse-search {
             margin-top: 20px;
-            max-width: 100%;
         }
     </style>
 </head>
 <body>
-    <h1>Qual é o seu maior medo?</h1>
-    <input type="text" id="fearInput" placeholder="Digite seu medo...">
-    <button onclick="searchFear()">Mostrar Medo</button>
-    <div id="imageResult"></div>
+    <h1>Bem-vindo ao Meu Site!</h1>
+    <p>Use a barra de pesquisa abaixo para encontrar o que precisa:</p>
 
-    <script src="script.js"></script>
+    <!-- Barra de pesquisa do Google Custom Search -->
+    <script async src="https://cse.google.com/cse.js?cx=600bc77c13ff14cc7"></script>
+    <div class="gcse-search"></div>
+
+    <!-- Conteúdo adicional do site -->
+    <div id="content">
+        <p>Este é um exemplo de site com uma barra de pesquisa personalizada.</p>
+    </div>
 </body>
 </html>
