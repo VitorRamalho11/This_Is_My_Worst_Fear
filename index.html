@@ -114,7 +114,6 @@
             
             inputContainer.style.display = 'none';
             imageResult.style.display = 'flex';
-            imageResult.innerHTML ';
             
             try {
                 // Busca várias imagens relacionadas ao medo
@@ -123,7 +122,6 @@
                 const data = await response.json();
 
                 if (data.items && data.items.length > 0) {
-                    imageResult.innerHTML = '';
                     images = data.items;
                     
                     // Cria elementos de imagem
@@ -147,6 +145,8 @@
 
         function startImageCarousel() {
             const allImages = document.querySelectorAll('#imageResult img');
+            
+            if (allImages.length === 0) return;
             
             // Mostra a primeira imagem
             allImages[0].classList.add('visible');
