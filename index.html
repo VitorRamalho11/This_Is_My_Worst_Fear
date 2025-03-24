@@ -65,8 +65,9 @@
         }
 
         #imageContainer img {
-            max-width: 100vw;
-            max-height: 100vh;
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
             position: absolute;
             opacity: 0;
             transition: opacity 0.3s;
@@ -97,10 +98,9 @@
                 return;
             }
 
-            document.body.innerHTML = ""; // Remove toda a interface anterior
-            const imageContainer = document.createElement("div");
-            imageContainer.id = "imageContainer";
-            document.body.appendChild(imageContainer);
+            const imageContainer = document.getElementById('imageContainer');
+            imageContainer.innerHTML = "<h2 style='color:white;'>Carregando...</h2>";
+            imageContainer.style.display = "flex";
 
             try {
                 const url = `https://www.googleapis.com/customsearch/v1?q=${encodeURIComponent(fear)}&cx=${cx}&key=${apiKey}&searchType=image&num=10`;
@@ -109,6 +109,7 @@
 
                 if (data.items && data.items.length > 0) {
                     images = data.items;
+                    imageContainer.innerHTML = ""; // Remove o texto de "Carregando..."
 
                     images.forEach(item => {
                         const img = document.createElement('img');
@@ -117,18 +118,23 @@
                         imageContainer.appendChild(img);
                     });
 
+                    document.body.innerHTML = ""; // Apaga o site e mostra só as imagens
+                    document.body.appendChild(imageContainer);
+
                     startImageCarousel();
                 } else {
-                    document.body.innerHTML = "<h1 style='color:white;'>Nenhuma imagem encontrada!</h1>";
+                    imageContainer.innerHTML = "<h1 style='color:white;'>Nenhuma imagem encontrada!</h1>";
                 }
             } catch (error) {
                 console.error("Erro ao buscar imagens:", error);
-                document.body.innerHTML = "<h1 style='color:white;'>Erro ao buscar imagens. Tente novamente!</h1>";
+                imageContainer.innerHTML = "<h1 style='color:white;'>Erro ao buscar imagens. Tente novamente!</h1>";
             }
         }
 
         function startImageCarousel() {
             const allImages = document.querySelectorAll('#imageContainer img');
+            if (allImages.length === 0) return;
+
             allImages[0].classList.add('visible');
 
             setInterval(() => {
