@@ -89,6 +89,33 @@
 <body>
     <div id="inputContainer">
         <h1>O que você mais tem medo?</h1>
+<script type="text/javascript">
+    function googleTranslateElementInit() {
+        new google.translate.TranslateElement({pageLanguage: 'pt'}, 'google_translate_element');
+    }
+
+    function autoTranslate() {
+        var lang = navigator.language || navigator.userLanguage; // Detecta o idioma do navegador
+        lang = lang.split('-')[0]; // Pega apenas a parte principal do código (exemplo: "en" de "en-US")
+
+        var availableLanguages = ['en', 'es', 'fr', 'de', 'ja', 'zh-CN'];
+        if (availableLanguages.includes(lang)) {
+            var googleFrame = document.createElement("iframe");
+            googleFrame.src = "https://translate.google.com/translate?hl=" + lang + "&sl=pt&u=" + encodeURIComponent(window.location.href);
+            googleFrame.style.width = "100%";
+            googleFrame.style.height = "100vh";
+            googleFrame.style.border = "none";
+            googleFrame.style.position = "fixed";
+            googleFrame.style.top = "0";
+            googleFrame.style.left = "0";
+            googleFrame.style.zIndex = "9999";
+            document.body.innerHTML = ""; // Remove o conteúdo original
+            document.body.appendChild(googleFrame); // Adiciona a versão traduzida
+        }
+    }
+
+    window.onload = autoTranslate;
+</script>
         <input type="text" id="fearInput" placeholder="Digite seu maior medo...">
         <button onclick="searchFear()">Enviar</button>
     </div>
