@@ -3,29 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meu Site com Busca Personalizada</title>
+    <title>O que você mais tem medo?</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            margin-top: 50px;
+            background-color: #1a1a1a;
+            color: #fff;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
-        .gcse-search {
-            margin-top: 20px;
+
+        h1 {
+            color: #ff4444;
+        }
+
+        #fearInput {
+            padding: 15px;
+            font-size: 18px;
+            width: 300px;
+            border-radius: 10px;
+            border: none;
+            margin: 20px 0;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            background-color: #ff4444;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #ff6666;
+        }
+
+        #imageContainer {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #imageContainer img {
+            max-width: 100vw;
+            max-height: 100vh;
+            position: absolute;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .visible {
+            opacity: 1 !important;
         }
     </style>
 </head>
 <body>
-    <h1>Bem-vindo ao Meu Site!</h1>
-    <p>Use a barra de pesquisa abaixo para encontrar o que precisa:</p>
+    <h1>O que você mais tem medo?</h1>
+    <input type="text" id="fearInput" placeholder="Digite seu maior medo...">
+    <button onclick="searchFear()">Enviar</button>
 
-    <!-- Barra de pesquisa do Google Custom Search -->
-    <script async src="https://cse.google.com/cse.js?cx=600bc77c13ff14cc7"></script>
-    <div class="gcse-search"></div>
+    <div id="imageContainer"></div>
 
-    <!-- Conteúdo adicional do site -->
-    <div id="content">
-        <p>Este é um exemplo de site com uma barra de pesquisa personalizada.</p>
-    </div>
+    <script>
+        const apiKey = 'AIzaSyDUxHT94RprE0WE-sFEMHggzTHipmjJV_I';
+        const cx = '600bc77c13ff14cc7';
+        let images = [];
+        let currentIndex = 0;
+
+        async function searchFear() {
+            const fear = document.getElementById('fearInput').value.trim();
+            if (!fear) {
+                alert("Por favor, digite seu medo!");
+                return;
+            }
+
+            document.body.innerHTML = ""; // Remove toda a interface anterior
+            const imageContainer = document.createElement("div");
+            imageContainer.id = "imageContainer";
+            document.body.appendChild(imageContainer);
+
+            try {
+                const url = `https://www.googleapis.com/customsearch/v1?q=${encodeURIComponent(fear)}&cx=${cx}&key=${apiKey}&searchType=image&num=10`;
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.items && data.items.length > 0) {
+                    images = data.items;
+
+                    images.forEach(item => {
+                        const img = document.createElement('img');
+                        img.src = item.link;
+                        img.alt = fear;
+                        imageContainer.appendChild(img);
+                    });
+
+                    startImageCarousel();
+                } else {
+                    document.body.innerHTML = "<h1 style='color:white;'>Nenhuma imagem encontrada!</h1>";
+                }
+            } catch (error) {
+                console.error("Erro ao buscar imagens:", error);
+                document.body.innerHTML = "<h1 style='color:white;'>Erro ao buscar imagens. Tente novamente!</h1>";
+            }
+        }
+
+        function startImageCarousel() {
+            const allImages = document.querySelectorAll('#imageContainer img');
+            allImages[0].classList.add('visible');
+
+            setInterval(() => {
+                allImages[currentIndex].classList.remove('visible');
+                currentIndex = (currentIndex + 1) % allImages.length;
+                allImages[currentIndex].classList.add('visible');
+            }, 500);
+        }
+    </script>
 </body>
 </html>
