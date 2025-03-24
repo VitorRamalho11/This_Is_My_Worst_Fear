@@ -5,37 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>O que você mais tem medo?</title>
     <style>
-        * {
+        body, html {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
+            height: 100%;
             font-family: Arial, sans-serif;
-            text-align: center;
             background-color: #1a1a1a;
             color: #fff;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            overflow: hidden;
         }
-
+        
+        #inputContainer {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 100;
+        }
+        
         h1 {
             color: #ff4444;
+            margin-bottom: 20px;
         }
-
+        
         #fearInput {
             padding: 15px;
             font-size: 18px;
             width: 300px;
             border-radius: 10px;
             border: none;
-            margin: 20px 0;
+            margin-bottom: 20px;
         }
-
+        
         button {
             padding: 15px 30px;
             font-size: 18px;
@@ -46,50 +48,59 @@
             cursor: pointer;
             transition: background-color 0.3s;
         }
-
+        
         button:hover {
             background-color: #ff6666;
         }
-
-        #imageContainer {
-            display: none;
+        
+        #imageResult {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: black;
-            display: flex;
-            align-items: center;
+            width: 100%;
+            height: 100%;
+            display: none;
             justify-content: center;
+            align-items: center;
+            background-color: rgba(0,0,0,0.9);
+            z-index: 90;
         }
-
-        #imageContainer img {
-            width: 100vw;
-            height: 100vh;
-            object-fit: cover;
+        
+        #imageResult img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            display: none;
             position: absolute;
-            opacity: 0;
-            transition: opacity 0.3s;
         }
-
+        
         .visible {
-            opacity: 1 !important;
+            display: block !important;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
     </style>
 </head>
 <body>
-    <h1>O que você mais tem medo?</h1>
-    <input type="text" id="fearInput" placeholder="Digite seu maior medo...">
-    <button onclick="searchFear()">Enviar</button>
-
-    <div id="imageContainer"></div>
+    <div id="inputContainer">
+        <h1>O que você mais tem medo?</h1>
+        <input type="text" id="fearInput" placeholder="Digite seu maior medo...">
+        <button onclick="searchFear()">Enviar</button>
+    </div>
+    
+    <div id="imageResult"></div>
 
     <script>
         const apiKey = 'AIzaSyDUxHT94RprE0WE-sFEMHggzTHipmjJV_I';
         const cx = '600bc77c13ff14cc7';
         let images = [];
         let currentIndex = 0;
+        let imageInterval;
 
         async function searchFear() {
             const fear = document.getElementById('fearInput').value.trim();
@@ -98,51 +109,60 @@
                 return;
             }
 
-            const imageContainer = document.getElementById('imageContainer');
-            imageContainer.innerHTML = "<h2 style='color:white;'>Carregando...</h2>";
-            imageContainer.style.display = "flex";
-
+            const inputContainer = document.getElementById('inputContainer');
+            const imageResult = document.getElementById('imageResult');
+            
+            inputContainer.style.display = 'none';
+            imageResult.style.display = 'flex';
+            imageResult.innerHTML = '<p style="color:white;font-size:24px;">Carregando imagens assustadoras...</p>';
+            
             try {
+                // Busca várias imagens relacionadas ao medo
                 const url = `https://www.googleapis.com/customsearch/v1?q=${encodeURIComponent(fear)}&cx=${cx}&key=${apiKey}&searchType=image&num=10`;
                 const response = await fetch(url);
                 const data = await response.json();
 
                 if (data.items && data.items.length > 0) {
+                    imageResult.innerHTML = '';
                     images = data.items;
-                    imageContainer.innerHTML = ""; // Remove o texto de "Carregando..."
-
+                    
+                    // Cria elementos de imagem
                     images.forEach(item => {
                         const img = document.createElement('img');
                         img.src = item.link;
                         img.alt = fear;
-                        imageContainer.appendChild(img);
+                        imageResult.appendChild(img);
                     });
-
-                    document.body.innerHTML = ""; // Apaga o site e mostra só as imagens
-                    document.body.appendChild(imageContainer);
-
+                    
+                    // Inicia o carrossel de imagens
                     startImageCarousel();
                 } else {
-                    imageContainer.innerHTML = "<h1 style='color:white;'>Nenhuma imagem encontrada!</h1>";
+                    imageResult.innerHTML = '<p style="color:white;font-size:24px;">Nenhuma imagem encontrada para esse medo!</p>';
                 }
             } catch (error) {
                 console.error("Erro ao buscar imagens:", error);
-                imageContainer.innerHTML = "<h1 style='color:white;'>Erro ao buscar imagens. Tente novamente!</h1>";
+                imageResult.innerHTML = '<p style="color:white;font-size:24px;">Erro ao buscar imagens. Recarregue a página e tente novamente!</p>';
             }
         }
 
         function startImageCarousel() {
-            const allImages = document.querySelectorAll('#imageContainer img');
-            if (allImages.length === 0) return;
-
+            const allImages = document.querySelectorAll('#imageResult img');
+            
+            // Mostra a primeira imagem
             allImages[0].classList.add('visible');
-
-            setInterval(() => {
+            
+            // Configura o loop para trocar imagens a cada 0.5 segundos
+            imageInterval = setInterval(() => {
                 allImages[currentIndex].classList.remove('visible');
                 currentIndex = (currentIndex + 1) % allImages.length;
                 allImages[currentIndex].classList.add('visible');
             }, 500);
         }
+
+        // Recarrega a página ao clicar em qualquer lugar quando as imagens estiverem sendo exibidas
+        document.getElementById('imageResult').addEventListener('click', function() {
+            location.reload();
+        });
     </script>
 </body>
 </html>
