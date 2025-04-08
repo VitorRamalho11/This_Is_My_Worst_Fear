@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>O que você mais tem medo?</title>
+    <!-- Importando a fonte Metal Mania do Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Metal+Mania&display=swap" rel="stylesheet">
     <style>
         body, html {
             margin: 0;
@@ -14,7 +16,7 @@
             color: #fff;
             overflow: hidden;
         }
-        
+
         #inputContainer {
             position: fixed;
             top: 50%;
@@ -23,12 +25,22 @@
             text-align: center;
             z-index: 100;
         }
-        
+
         h1 {
             color: #ff4444;
             margin-bottom: 20px;
+            font-family: 'Metal Mania', cursive;
+            font-size: 4em;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 3px 3px 0 #000, 
+                         -1px -1px 0 #000,  
+                         1px -1px 0 #000,
+                         -1px 1px 0 #000,
+                         1px 1px 0 #000;
+            margin-top: 0;
         }
-        
+
         #fearInput {
             padding: 15px;
             font-size: 18px;
@@ -36,8 +48,9 @@
             border-radius: 10px;
             border: none;
             margin-bottom: 20px;
+            text-align: center;
         }
-        
+
         button {
             padding: 15px 30px;
             font-size: 18px;
@@ -47,12 +60,14 @@
             border-radius: 10px;
             cursor: pointer;
             transition: background-color 0.3s;
+            font-weight: bold;
         }
-        
+
         button:hover {
             background-color: #ff6666;
+            transform: scale(1.05);
         }
-        
+
         #imageResult {
             position: fixed;
             top: 0;
@@ -65,21 +80,21 @@
             background-color: rgba(0,0,0,0.9);
             z-index: 90;
         }
-        
+
         #imageResult img {
             max-width: 90%;
             max-height: 90%;
             border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
             display: none;
             position: absolute;
         }
-        
+
         .visible {
             display: block !important;
             animation: fadeIn 0.5s;
         }
-        
+
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -89,37 +104,10 @@
 <body>
     <div id="inputContainer">
         <h1>O que você mais tem medo?</h1>
-<script type="text/javascript">
-    function googleTranslateElementInit() {
-        new google.translate.TranslateElement({pageLanguage: 'pt'}, 'google_translate_element');
-    }
-
-    function autoTranslate() {
-        var lang = navigator.language || navigator.userLanguage; // Detecta o idioma do navegador
-        lang = lang.split('-')[0]; // Pega apenas a parte principal do código (exemplo: "en" de "en-US")
-
-        var availableLanguages = ['en', 'es', 'fr', 'de', 'ja', 'zh-CN'];
-        if (availableLanguages.includes(lang)) {
-            var googleFrame = document.createElement("iframe");
-            googleFrame.src = "https://translate.google.com/translate?hl=" + lang + "&sl=pt&u=" + encodeURIComponent(window.location.href);
-            googleFrame.style.width = "100%";
-            googleFrame.style.height = "100vh";
-            googleFrame.style.border = "none";
-            googleFrame.style.position = "fixed";
-            googleFrame.style.top = "0";
-            googleFrame.style.left = "0";
-            googleFrame.style.zIndex = "9999";
-            document.body.innerHTML = ""; // Remove o conteúdo original
-            document.body.appendChild(googleFrame); // Adiciona a versão traduzida
-        }
-    }
-
-    window.onload = autoTranslate;
-</script>
         <input type="text" id="fearInput" placeholder="Digite seu maior medo...">
         <button onclick="searchFear()">Enviar</button>
     </div>
-    
+
     <div id="imageResult"></div>
 
     <script>
@@ -138,28 +126,26 @@
 
             const inputContainer = document.getElementById('inputContainer');
             const imageResult = document.getElementById('imageResult');
-            
+
             inputContainer.style.display = 'none';
             imageResult.style.display = 'flex';
-            
+
             try {
-                // Busca várias imagens relacionadas ao medo
                 const url = `https://www.googleapis.com/customsearch/v1?q=${encodeURIComponent(fear)}&cx=${cx}&key=${apiKey}&searchType=image&num=10`;
                 const response = await fetch(url);
                 const data = await response.json();
 
                 if (data.items && data.items.length > 0) {
                     images = data.items;
-                    
-                    // Cria elementos de imagem
+                    imageResult.innerHTML = '';
+
                     images.forEach(item => {
                         const img = document.createElement('img');
                         img.src = item.link;
                         img.alt = fear;
                         imageResult.appendChild(img);
                     });
-                    
-                    // Inicia o carrossel de imagens
+
                     startImageCarousel();
                 } else {
                     imageResult.innerHTML = '<p style="color:white;font-size:24px;">Nenhuma imagem encontrada para esse medo!</p>';
@@ -172,13 +158,11 @@
 
         function startImageCarousel() {
             const allImages = document.querySelectorAll('#imageResult img');
-            
+
             if (allImages.length === 0) return;
-            
-            // Mostra a primeira imagem
+
             allImages[0].classList.add('visible');
             
-            // Configura o loop para trocar imagens a cada 0.5 segundos
             imageInterval = setInterval(() => {
                 allImages[currentIndex].classList.remove('visible');
                 currentIndex = (currentIndex + 1) % allImages.length;
@@ -186,10 +170,14 @@
             }, 500);
         }
 
-        // Recarrega a página ao clicar em qualquer lugar quando as imagens estiverem sendo exibidas
         document.getElementById('imageResult').addEventListener('click', function() {
             location.reload();
         });
+
+        // Focar no input ao carregar a página
+        window.onload = function() {
+            document.getElementById('fearInput').focus();
+        };
     </script>
 </body>
 </html>
